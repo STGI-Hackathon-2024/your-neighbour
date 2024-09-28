@@ -1,10 +1,15 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useContext } from "react";
+import { PhotoContext } from "../utils/contexts.js";
+import { Link } from "react-router-dom";
 
-const WebcamFeed = ({updateStep}) => {
+const Capture = () => {
 	const videoRef = useRef(null);
 	const canvasRef = useRef(null);
 	const [stream, setStream] = useState(null);
 	const [imageCaptured, setImageCaptured] = useState(false); // State to toggle between video and image
+	const [photo, setPhoto] = useContext(PhotoContext);
+	const [validity, setValidity] = useState(photo !== null);
+	const [loading, setLoading] = useState(false);
 
 	// Function to start the webcam stream
 	const startWebcam = async () => {
@@ -47,7 +52,8 @@ const WebcamFeed = ({updateStep}) => {
 				formData.append("file", blob, "image.jpg"); // Append the Blob to FormData
 
 				// Sending the image via fetch
-                const context = canvasRef.current.getContext("2d");
+				const context = canvasRef.current.getContext("2d");
+				setLoading(true);
 				fetch("http://swift.local:8000/spoofing", {
 					method: "POST",
 					body: formData,
@@ -55,17 +61,25 @@ const WebcamFeed = ({updateStep}) => {
 					.then((response) => response.json())
 					.then((data) => {
 						console.log("Image uploaded successfully:", data);
-                        context.lineWidth = 10
-                        context.strokeStyle = data.validity ? "green" : "red";
-                        data.faces?.forEach(face => {
-                            context.strokeRect(face.x, face.y, face.w, face.h)
-                        })
-                        if(data.validity) {
-                            updateStep(2);
-                        }
+						context.lineWidth = 10;
+						context.strokeStyle = data.validity ? "green" : "red";
+						data.faces?.forEach((face) => {
+							context.strokeRect(face.x, face.y, face.w, face.h);
+						});
+						if (data.validity) {
+							setValidity(true);
+							setPhoto(blob);
+						} else {
+							setValidity(false);
+							setPhoto(null);
+						}
+						setLoading(false);
 					})
 					.catch((error) => {
 						console.error("Error uploading the image:", error);
+						setValidity(false);
+						setPhoto(null);
+						setLoading(false);
 					});
 			}, "image/jpg");
 		}
@@ -99,17 +113,17 @@ const WebcamFeed = ({updateStep}) => {
 				style={{ display: imageCaptured ? "block" : "none", marginTop: "20px", border: "1px solid black" }}
 			/>
 
-			<div style={{ marginTop: "20px" }}>
+			{!loading ? <div style={{ marginTop: "20px" }}>
 				{!imageCaptured ? (
 					// Show the "Capture Image" button when the video is active
 					<button onClick={captureImage}>Capture Image</button>
 				) : (
 					// Show the "Resume Webcam" button after an image is captured
-					<button onClick={resumeWebcam}>Resume Webcam</button>
+					<>{validity ? <Link to={"/document"}>Upload Document</Link> : <button onClick={resumeWebcam}>Retry</button>}</>
 				)}
-			</div>
+			</div> : <button>Loading</button>}
 		</div>
 	);
 };
 
-export default WebcamFeed;
+export default Capture;
