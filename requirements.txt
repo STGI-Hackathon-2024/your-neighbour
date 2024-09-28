@@ -1,0 +1,6 @@
+gradio
+wheel
+face_recognition
+numpy
+faiss-cpu
+pickle
