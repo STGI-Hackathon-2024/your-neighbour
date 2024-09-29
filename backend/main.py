@@ -73,6 +73,7 @@ async def aidetect(photo: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
     
+# Requires Dburl environment variable to be set to the postgres deployment connection string
 @app.post("/search/")
 async def search(photo: UploadFile = File(...)):
     try:
@@ -86,7 +87,8 @@ async def search(photo: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
-    
+
+# Replace the path with the path of your Casia WebFace dataset copy
 @app.get("/casiawebface/{filename}")
 async def get_image(filename):
     try:
