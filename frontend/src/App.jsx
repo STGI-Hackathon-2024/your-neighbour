@@ -7,7 +7,8 @@ import Capture from "./pages/Capture.jsx";
 import Home from "./pages/Home.jsx";
 import { PhotoContext, DocumentContext } from "./utils/contexts.js";
 import DocumentCapture from "./pages/DocumentCapture.jsx";
-import MatchPhotoID from "./pages/match.jsx";
+import MatchPhotoID from "./pages/Match.jsx";
+import Search from "./pages/Search.jsx";
 
 const router = createBrowserRouter([
 	{
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "/match",
     element: <MatchPhotoID />
+  },
+  {
+    path: "/search",
+    element: <Search />
   }
 ]);
 

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useContext } from "react";
 import { PhotoContext } from "../utils/contexts.js";
 import { Link } from "react-router-dom";
+import Header from "../component/Header.jsx";
 
 const Capture = () => {
 	const videoRef = useRef(null);
@@ -103,26 +104,29 @@ const Capture = () => {
 	}, [imageCaptured]); // Restart webcam only when imageCaptured state changes
 
 	return (
-		<div>
-			<h1>Webcam Capture</h1>
-			<video ref={videoRef} autoPlay width="640" height="480" style={{ display: imageCaptured ? "none" : "block" }} />
-			<canvas
-				ref={canvasRef}
-				width="640"
-				height="480"
-				style={{ display: imageCaptured ? "block" : "none", marginTop: "20px", border: "1px solid black" }}
-			/>
-
-			{!loading ? <div style={{ marginTop: "20px" }}>
-				{!imageCaptured ? (
-					// Show the "Capture Image" button when the video is active
-					<button onClick={captureImage}>Capture Image</button>
-				) : (
-					// Show the "Resume Webcam" button after an image is captured
-					<>{validity ? <Link to={"/document"}>Upload Document</Link> : <button onClick={resumeWebcam}>Retry</button>}</>
-				)}
-			</div> : <button>Loading</button>}
-		</div>
+		<>
+			<Header />
+			<main>
+				<h1>Webcam Capture</h1>
+				<video className="user-image" ref={videoRef} autoPlay width="640" height="480" style={{ display: imageCaptured ? "none" : "block" }} />
+				<canvas className="user-image" ref={canvasRef} width="640" height="480" style={{ display: imageCaptured ? "block" : "none" }} />
+				<div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
+					{!loading ? (
+						<>
+							{!imageCaptured ? (
+								// Show the "Capture Image" button when the video is active
+								<button onClick={captureImage}>Capture Image</button>
+							) : (
+								// Show the "Resume Webcam" button after an image is captured
+								<>{validity ? <Link to={"/document"}>Upload Document</Link> : <button onClick={resumeWebcam}>Retry</button>}</>
+							)}
+						</>
+					) : (
+						<div className="loader"></div>
+					)}
+				</div>
+			</main>
+		</>
 	);
 };
 

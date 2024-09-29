@@ -3,17 +3,13 @@ import { DocumentContext, PhotoContext } from "../utils/contexts.js";
 import { Link, Navigate } from "react-router-dom";
 import Header from "../component/Header.jsx";
 
-const DocumentCapture = () => {
+const Search = () => {
 	const [file, setFile] = useState(null); // State to store the uploaded file
 	const [previewUrl, setPreviewUrl] = useState(null); // State to store image preview URL
 	const [validity, setValidity] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [photo, setPhoto] = useContext(PhotoContext);
-	const [document, setDocument] = useContext(DocumentContext);
-
-	if (photo == null) {
-		return <Navigate to="/capture" replace={true} />;
-	}
+	const [results, setResults] = useState([]);
+	const [ai, setAi] = useState(false);
 
 	// Handle file input change
 	const handleFileChange = (event) => {
@@ -39,7 +35,7 @@ const DocumentCapture = () => {
 		setLoading(true);
 
 		try {
-			const response = await fetch("http://swift.local:8000/countfaces/", {
+			const response = await fetch("http://swift.local:8000/search/", {
 				method: "POST",
 				body: formData,
 			});
@@ -47,16 +43,12 @@ const DocumentCapture = () => {
 			if (response.ok) {
 				const result = await response.json();
 				console.log("Image uploaded successfully:", result);
-				if (result) {
-					setDocument(file);
-					setValidity(true);
-				} else {
-					setDocument(null);
-					setValidity(false);
-				}
+                setAi(result.ai)
+                console.log(result)
+                setResults(result.results.map(r => r[0].substring(1)))
+				setValidity(true)
 			} else {
 				console.error("Upload failed:", response.statusText);
-				setDocument(null);
 				setValidity(false);
 			}
 			setLoading(false);
@@ -64,7 +56,6 @@ const DocumentCapture = () => {
 			console.error("Error uploading the image:", error);
 			alert("An error occurred while uploading the image.");
 			setLoading(false);
-			setDocument(null);
 			setValidity(false);
 		}
 	};
@@ -73,7 +64,7 @@ const DocumentCapture = () => {
 		<>
 			<Header />
 			<main>
-				<h1>Upload ID Card Image</h1>
+				<h1>Upload Image for Searching</h1>
 
 				<form onSubmit={handleSubmit}>
 					<div>
@@ -97,8 +88,13 @@ const DocumentCapture = () => {
 							<div className="loader"></div>
 						) : validity ? (
 							<>
-								<h3>ID Checked</h3>
-								<Link to={"/match"}>Verify ID and Photo</Link>
+								{ai ? <h3>Image is potentially AI Generated!</h3> : <h3>Image is authentic!</h3>}
+
+								<div style={{marginTop: "20px", display: "flex", flexDirection :"row", flexWrap: "wrap", justifyContent: "center", gap: 16}}>
+									{results.map((image) => (
+										<img className="user-image" src={"http://swift.local:8000" + image} alt="Preview" width="300" />
+									))}
+								</div>
 							</>
 						) : (
 							<button type="submit">Check Image</button>
@@ -110,4 +106,4 @@ const DocumentCapture = () => {
 	);
 };
 
-export default DocumentCapture;
+export default Search;
