@@ -10,5 +10,8 @@ Design a comprehensive KYC (Know Your Customer) verification platform that ensur
 - Ridham Gupta
 - Swastik Sethi
 
+## Presentation:
+[Presentation](https://www.canva.com/design/DAGSF_DBfnk/8PN2uZEFFFDyHub4Me17CQ/edit?utm_content=DAGSF_DBfnk&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
 ## Video Demo:
 [Video Demo](https://youtu.be/NaXDXojI5ug)
